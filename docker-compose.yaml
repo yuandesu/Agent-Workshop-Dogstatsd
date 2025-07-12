@@ -1,0 +1,60 @@
+# Docker Compose 檔案版本，定義了支援的功能和語法
+version: '3' 
+
+# 定義服務清單，每個服務代表一個容器
+services:
+  # Datadog Agent 服務 - 用於收集和轉發監控數據
+  datadog-agent:
+    # 使用 Datadog 官方的最新 Agent 映像
+    image: gcr.io/datadoghq/agent:latest
+    # 設定容器名稱，方便識別和管理
+    container_name: datadog-agent
+    # 使用主機的 cgroup 命名空間，讓 Agent 可以監控主機系統
+    cgroup: host
+    # 使用主機的 PID 命名空間，讓 Agent 可以監控主機進程
+    pid: host
+    # 掛載主機目錄到容器內，讓 Agent 可以收集系統資訊
+    volumes:
+      # 掛載 Docker socket，讓 Agent 可以監控 Docker 容器
+      - /var/run/docker.sock:/var/run/docker.sock
+      # 掛載主機的 /proc 目錄（唯讀），用於收集系統進程資訊
+      - /proc/:/host/proc/:ro
+      # 掛載主機的 cgroup 目錄（唯讀），用於收集系統資源使用情況
+      - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+    # 設定環境變數，配置 Datadog Agent 的行為
+    environment:
+      # Datadog API 金鑰，用於向 Datadog 平台發送數據
+      - DD_API_KEY=${DD_API_KEY}
+      # Datadog 站點，指定數據發送的目標平台
+      - DD_SITE=${DD_SITE}
+      # 啟用非本地 DogStatsD 流量，允許接收來自其他容器的指標
+      # 
+      # 架構說明：
+      # weather-sim-app 容器
+      #     ↓ (發送指標)
+      # datadog-agent 容器
+      #     ├── DogStatsD (8125端口) ← 接收指標
+      #     ├── Collector ← 處理指標
+      #     └── Forwarder ← 發送到 Datadog
+      #
+      # 為什麼需要這個設定：
+      # - DogStatsD 是 Datadog Agent 的一個模組，不是獨立的服務
+      # - 它監聽在 8125 端口，使用 UDP 協議
+      # - DogStatsD 預設只接受來自同一個容器內的連接
+      # - 當 weather-sim-app 容器要連接到 datadog-agent 容器內的 DogStatsD 時
+      # - 這是一個跨容器連接，所以需要特別設定
+      # - 沒有這個設定，跨容器連接會被拒絕，導致監控數據無法發送
+      # - 設定為 true 後，DogStatsD 會接受來自任何 IP 的連接
+      # - 在 Docker Compose 網路中，這通常是安全的，因為只有同網路容器能互相通信
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+  
+  # 天氣模擬應用程式服務
+  weather-sim-app:
+    # 使用本地構建的映像，版本為 1.0
+    image: weather-sim:1.0
+    # 設定容器名稱，方便識別和管理
+    container_name: weather-sim-app
+    # 設定環境變數，配置應用程式的行為
+    environment:
+      # 指定 Datadog Agent 的主機名，用於發送監控指標
+      - DD_AGENT_HOST=datadog-agent
