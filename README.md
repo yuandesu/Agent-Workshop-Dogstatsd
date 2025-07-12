@@ -1,17 +1,7 @@
 # Agent Workshop DogStatsD
 
-## 概述
-
-這些資源用於動手故障排除：[TARDIS Telemetry: Weather Metrics in Datadog with DogStatsD](https://datadoghq.atlassian.net/wiki/spaces/TS/pages/4084793345/TARDIS+Telemetry+Weather+Metrics+in+Datadog+with+DogStatsD)
-
-## 原始資源
-
-- 原始 [repository](https://github.com/Dog-Gone-Earl/Agent-Spec-Sandboxes/tree/main/Dogstatsd/dogstatsd-weather-sim-app)
-- 原始 [文件](https://datadoghq.atlassian.net/wiki/spaces/TS/pages/2789376418/Dogstatsd+Exercise+Python)
-
 ## 環境設定
 
-### 步驟 1: 設定環境變數
 複製 `.env.example` 為 `.env` 並填入您的 Datadog API key：
 
 ```bash
@@ -24,9 +14,17 @@ DD_API_KEY=your_datadog_api_key_here
 DD_SITE=datadoghq.com
 ```
 
-## 部署流程
+## 如何啟動
 
-### 步驟 2: 構建應用程式映像
+直接執行 `setup.sh` 即可：
+
+```bash
+./setup.sh
+```
+
+### 詳細說明
+
+#### 步驟 1: 構建應用程式映像
 ```bash
 docker build -t weather-sim:1.0 .
 ```
@@ -36,7 +34,7 @@ docker build -t weather-sim:1.0 .
 - 包含：weather_code.py、requirements.txt、Dockerfile 等
 - 建立本地映像 weather-sim:1.0
 
-### 步驟 3: 啟動服務
+#### 步驟 2: 啟動服務
 ```bash
 docker compose up -d
 ```
