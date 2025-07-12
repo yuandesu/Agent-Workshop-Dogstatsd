@@ -1,7 +1,31 @@
 # Agent Workshop DogStatsD
 
+## Introduction of DogStatsD
+The Datadog Agent is responsible for collecting, processing, and sending various types of monitoring data to Datadog. DogStatsD works as part of the Datadog Agent by acting as an intermediary between an application and the Agent itself.
+
+Here’s a simplified flow of how it works:
+
+1. A customer’s application sends data to DogStatsD:
+   The application (written in any supported programming language like Python, Java, etc.) sends metrics to DogStatsD by using one of the many client libraries provided by Datadog.
+
+2. DogStatsD receives and buffers data:
+   DogStatsD, running inside the Datadog Agent, collects these metrics and buffers them temporarily. It can handle various metric types like counters, gauges, histograms, and timers, which help measure specific aspects of an application, such as requests per second or memory usage.
+
+3. The Datadog agent processes and sends data to Datadog:
+   Once DogStatsD has received the metrics, it sends them to the Datadog Agent. The Agent processes the data, including applying any necessary tags, and forwards the metrics to Datadog’s backend where they are analyzed and visualized in the UI.
+
+## 概述
+
+這些資源用於動手故障排除：[TARDIS Telemetry: Weather Metrics in Datadog with DogStatsD](https://datadoghq.atlassian.net/wiki/spaces/TS/pages/4084793345/TARDIS+Telemetry+Weather+Metrics+in+Datadog+with+DogStatsD)
+
+## 原始資源
+
+- 原始 [repository](https://github.com/Dog-Gone-Earl/Agent-Spec-Sandboxes/tree/main/Dogstatsd/dogstatsd-weather-sim-app)
+- 原始 [文件](https://datadoghq.atlassian.net/wiki/spaces/TS/pages/2789376418/Dogstatsd+Exercise+Python)
+
 ## 環境設定
 
+### 步驟 1: 設定環境變數
 複製 `.env.example` 為 `.env` 並填入您的 Datadog API key：
 
 ```bash
